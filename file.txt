@@ -1,0 +1,46 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Load the training data
+train_data = pd.read_csv('train.csv')
+# Load the test data
+test_data = pd.read_csv('test.csv')
+
+# Fill missing values with mean for simplicity
+train_data.fillna(train_data.mean(), inplace=True)
+test_data.fillna(test_data.mean(), inplace=True)
+
+# One-hot encode categorical variables
+train_data = pd.get_dummies(train_data, drop_first=True)
+test_data = pd.get_dummies(test_data, drop_first=True)
+
+# Align the test set to the train set's features
+test_data = test_data.reindex(columns = train_data.columns, fill_value=0)
+
+# Split the data into features and target variable
+X_train = train_data.drop('price', axis=1)
+y_train = train_data['price']
+X_test = test_data.drop('price', axis=1)
+y_test = test_data['price']
+
+# Initialize and train the model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predict using the test data
+y_pred = model.predict(X_test)
+
+# Calculate Mean Squared Error and R-squared
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f'Mean Squared Error: {mse}')
+print(f'R-squared: {r2}')
+
+# Save results to GitHub (example commands)
+# !git add .
+# !git commit -m "Add linear regression model and results"
+# !git push origin main
+
